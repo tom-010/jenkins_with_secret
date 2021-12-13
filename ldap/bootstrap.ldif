@@ -1,0 +1,12 @@
+version: 1
+
+# Entry 1: cn=gerritadmin,dc=example,dc=org
+dn: cn=gerritadmin,dc=example,dc=org
+cn: gerritadmin
+givenname: gerritadmin
+mail: gerritadmin@localhost
+objectclass: inetOrgPerson
+objectclass: top
+sn: gerritadmin
+uid: gerritadmin
+userpassword: {MD5}Smbduzhf2/eFIFH84p86pQ==

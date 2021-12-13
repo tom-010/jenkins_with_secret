@@ -1,0 +1,72 @@
+version: '3'
+services:
+
+  nginx:
+    image: "nginx:latest"
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./conf/nginx/conf.d:/etc/nginx/conf.d
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - ci-net
+      - ldap-net
+    depends_on:
+      - ci
+      - ldap-admin
+
+  ci:
+    build: ./jenkins
+    restart: unless-stopped
+    environment:
+      - LDAP_PASSWORD=${ADMIN_PASSWORD}
+      - GERRIT_USER=gerritadmin
+      - GERRIT_PASSWORD=${ADMIN_PASSWORD}
+    expose:
+      - '8080'
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    networks:
+      - ci-net
+      - ldap-net
+    depends_on:
+      - ldap
+  
+  ldap:
+    build: ./ldap
+    restart: unless-stopped
+    expose:
+      - 389
+      - 636
+    environment: # username: cn=admin,dc=example,dc=org
+      - LDAP_ADMIN_PASSWORD=${ADMIN_PASSWORD}
+    volumes:
+      - ldap:/var/lib/ldap
+      - ldap-conf:/etc/ldap/slapd.d
+    networks:
+      - ldap-net
+
+
+  ldap-admin:
+    image: osixia/phpldapadmin
+    restart: unless-stopped
+    expose:
+      - 443
+    environment:
+      - PHPLDAPADMIN_LDAP_HOSTS=ldap
+      - PHPLDAPADMIN_HTTPS=false 
+    networks:
+      - ldap-net
+
+
+
+volumes:
+  jenkins_home:
+  ldap:
+  ldap-conf:
+
+networks:
+  ci-net:
+  ldap-net:
+  

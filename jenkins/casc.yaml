@@ -1,0 +1,28 @@
+jenkins:
+  securityRealm:
+    ldap:
+      configurations:
+        - displayNameAttributeName: "cn"
+          managerDN: cn=admin,dc=example,dc=org
+          managerPasswordSecret: ${LDAP_PASSWORD}
+          rootDN: dc=example,dc=org
+          server: ldap://ldap
+      groupIdStrategy: "caseInsensitive"
+      userIdStrategy: "caseInsensitive"
+
+  authorizationStrategy:
+    globalMatrix:
+      permissions:
+        - "Overall/Administer:admin"
+        - "Overall/Read:authenticated"
+        - "Overall/Administer:authenticated"
+  remotingSecurity:
+    enabled: true
+security:
+  queueItemAuthenticator:
+    authenticators:
+    - global:
+        strategy: triggeringUsersAuthorizationStrategy
+unclassified:
+  location:
+    url: http://ci.firmenessen.de/
